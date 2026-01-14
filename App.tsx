@@ -31,33 +31,37 @@ const App: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
 
   useEffect(() => {
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      tg.ready();
-      tg.expand();
-      
-      const tgUser = tg.initDataUnsafe?.user;
-      if (tgUser) {
-        setUser({
-          id: tgUser.id,
-          first_name: tgUser.first_name,
-          last_name: tgUser.last_name,
-          username: tgUser.username,
-          photo_url: tgUser.photo_url,
-          isAdmin: true 
-        });
-      } else {
-        setUser({
-          id: 12345,
-          first_name: "Иван Фермер",
-          username: "ivan_farmer",
-          isAdmin: true
-        });
-      }
+    try {
+      const tg = window.Telegram?.WebApp;
+      if (tg) {
+        tg.ready();
+        tg.expand();
+        
+        const tgUser = tg.initDataUnsafe?.user;
+        if (tgUser) {
+          setUser({
+            id: tgUser.id,
+            first_name: tgUser.first_name,
+            last_name: tgUser.last_name,
+            username: tgUser.username,
+            photo_url: tgUser.photo_url,
+            isAdmin: true 
+          });
+        } else {
+          setUser({
+            id: 12345,
+            first_name: "Иван Фермер",
+            username: "ivan_farmer",
+            isAdmin: true
+          });
+        }
 
-      if (localStorage.getItem('user_region')) {
-        setView('home');
+        if (localStorage.getItem('user_region')) {
+          setView('home');
+        }
       }
+    } catch (e) {
+      console.error("WebApp initialization failed:", e);
     }
   }, []);
 
@@ -184,7 +188,7 @@ const App: React.FC = () => {
     <Layout 
       activeView={view} 
       onViewChange={(newView) => {
-        window.Telegram?.WebApp?.HapticFeedback?.impactOccurred('light');
+        window.Telegram?.WebApp?.HapticFeedback?.impactOccurred?.('light');
         setView(newView);
       }}
       region={region}

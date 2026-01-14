@@ -12,21 +12,58 @@ interface ProfileViewProps {
 
 const ProfileView: React.FC<ProfileViewProps> = ({ user, region, productsCount, onAdminClick }) => {
   const handleNotImplemented = (label: string) => {
+    console.log(`Triggered: ${label}`);
     const tg = window.Telegram?.WebApp;
-    if (tg && tg.showPopup) {
-      tg.HapticFeedback?.notificationOccurred('warning');
-      tg.showPopup({
-        title: 'В разработке',
-        message: `Раздел "${label}" скоро появится. Мы работаем над этим!`,
-        buttons: [{ type: 'ok', text: 'Понятно' }]
-      });
-    } else {
-      alert(`Раздел "${label}" скоро появится! Мы уже готовим его для вас.`);
+    
+    // Haptic feedback if available
+    try {
+      tg?.HapticFeedback?.notificationOccurred('warning');
+    } catch (e) {
+      console.warn("Haptic feedback failed", e);
     }
+
+    const message = `Раздел "${label}" находится в разработке. Мы сообщим вам, когда он будет готов.`;
+    const title = 'Скоро будет!';
+
+    // Explicit feature detection is safer than version checking
+    if (tg && typeof tg.showPopup === 'function') {
+      try {
+        tg.showPopup({
+          title: title,
+          message: message,
+          buttons: [{ type: 'ok', text: 'Понятно' }]
+        });
+        return;
+      } catch (e) {
+        console.error("showPopup failed", e);
+      }
+    } 
+    
+    // Fallback to showAlert (available since v6.0)
+    if (tg && typeof tg.showAlert === 'function') {
+      try {
+        tg.showAlert(message);
+        return;
+      } catch (e) {
+        console.error("showAlert failed", e);
+      }
+    } 
+    
+    // Final fallback to native alert
+    alert(message);
+  };
+
+  const handleAdminDashboard = () => {
+    console.log('Opening Admin Dashboard');
+    const tg = window.Telegram?.WebApp;
+    try {
+      tg?.HapticFeedback?.impactOccurred('medium');
+    } catch (e) {}
+    onAdminClick();
   };
 
   return (
-    <div className="px-6 pt-6 bg-[#0F110F] min-h-screen pb-24 text-white">
+    <div className="px-6 pt-6 bg-[#0F110F] min-h-screen pb-24 text-white animate-in fade-in duration-500">
       {/* User Profile Header */}
       <div className="flex items-center gap-6 mb-12 pt-6">
         <div className="relative">
@@ -71,10 +108,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, region, productsCount, 
             <Sparkles size={20} className="text-amber-500/30" />
           </div>
           <button 
-            onClick={() => {
-              window.Telegram?.WebApp?.HapticFeedback?.impactOccurred('medium');
-              onAdminClick();
-            }}
+            onClick={handleAdminDashboard}
             className="w-full bg-[#F59E0B] text-black py-4.5 rounded-[22px] font-black uppercase tracking-widest text-[11px] transition-all active:scale-95 shadow-[0_15px_30px_-10px_rgba(245,158,11,0.4)]"
           >
             Войти в амбар
@@ -92,37 +126,41 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, region, productsCount, 
           icon={<Package size={20} />} 
           label="Мои объявления" 
           badge={productsCount.toString()} 
-          onClick={onAdminClick}
+          onClick={handleAdminDashboard}
         />
         
         <MenuItem 
           icon={<Heart size={20} />} 
           label="Избранные фермы" 
-          onClick={() => handleNotImplemented('Избранное')}
+          onClick={() => handleNotImplemented('Избранные фермы')}
         />
         
         <MenuItem 
           icon={<Clock size={20} />} 
           label="История покупок" 
-          onClick={() => handleNotImplemented('История')}
+          onClick={() => handleNotImplemented('История покупок')}
         />
         
         <MenuItem 
           icon={<HelpCircle size={20} />} 
           label="Служба поддержки" 
-          onClick={() => handleNotImplemented('Поддержка')}
+          onClick={() => handleNotImplemented('Служба поддержки')}
         />
         
         <MenuItem 
           icon={<Settings size={20} />} 
           label="Конфиденциальность" 
-          onClick={() => handleNotImplemented('Настройки')}
+          onClick={() => handleNotImplemented('Конфиденциальность')}
         />
         
         <button 
           onClick={() => {
-            window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('error');
-            window.location.reload();
+            try {
+              window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('error');
+            } catch (e) {}
+            if (confirm('Вы уверены, что хотите перезагрузить приложение?')) {
+              window.location.reload();
+            }
           }}
           className="w-full flex items-center justify-center gap-3 p-5 rounded-3xl text-gray-500 font-black uppercase tracking-widest text-[10px] active:bg-red-500/10 active:text-red-400 transition-all mt-10 border border-white/5 bg-[#1A1D1A]/30"
         >
@@ -141,23 +179,25 @@ interface MenuItemProps {
   onClick: () => void;
 }
 
-const MenuItem: React.FC<MenuItemProps> = ({ icon, label, badge, onClick }) => (
-  <button 
-    onClick={() => {
-      window.Telegram?.WebApp?.HapticFeedback?.impactOccurred('light');
-      onClick();
-    }}
-    className="w-full flex items-center justify-between p-5.5 bg-[#1A1D1A] border border-white/5 rounded-[28px] active:bg-white/5 active:scale-[0.98] transition-all group"
-  >
-    <div className="flex items-center gap-5">
-      <div className="text-gray-500 group-active:text-[#F59E0B] transition-colors">{icon}</div>
-      <span className="font-black text-gray-200 text-sm uppercase tracking-tight">{label}</span>
-    </div>
-    <div className="flex items-center gap-3">
-      {badge && <span className="text-[9px] font-black text-black bg-[#F59E0B] px-3.5 py-1.5 rounded-xl uppercase shadow-lg shadow-amber-500/20">{badge}</span>}
-      <ChevronRight size={18} className="text-gray-700" />
-    </div>
-  </button>
-);
+const MenuItem: React.FC<MenuItemProps> = ({ icon, label, badge, onClick }) => {
+  return (
+    <button 
+      onClick={(e) => {
+        e.preventDefault();
+        onClick();
+      }}
+      className="w-full flex items-center justify-between p-5.5 bg-[#1A1D1A] border border-white/5 rounded-[28px] active:bg-white/5 active:scale-[0.98] transition-all group"
+    >
+      <div className="flex items-center gap-5">
+        <div className="text-gray-500 group-active:text-[#F59E0B] transition-colors">{icon}</div>
+        <span className="font-black text-gray-200 text-sm uppercase tracking-tight">{label}</span>
+      </div>
+      <div className="flex items-center gap-3">
+        {badge && <span className="text-[9px] font-black text-black bg-[#F59E0B] px-3.5 py-1.5 rounded-xl uppercase shadow-lg shadow-amber-500/20">{badge}</span>}
+        <ChevronRight size={18} className="text-gray-700" />
+      </div>
+    </button>
+  );
+};
 
 export default ProfileView;
