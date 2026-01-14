@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ФермаРядом</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+          --tg-theme-bg-color: #0F110F;
+          --tg-theme-secondary-bg-color: #1A1D1A;
+          --tg-theme-text-color: #FFFFFF;
+          --tg-theme-hint-color: #9CA3AF;
+          --tg-theme-link-color: #F59E0B;
+          --tg-theme-button-color: #F59E0B;
+          --tg-theme-button-text-color: #000000;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: contain;
+            background-color: #0F110F;
+            color: #FFFFFF;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        .safe-bottom {
+            padding-bottom: calc(env(safe-area-inset-bottom) + 1rem);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        ::selection {
+            background-color: #F59E0B;
+            color: black;
+        }
+        .dark-card {
+            background: #1A1D1A;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .amber-glow {
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+        }
+        @keyframes slideUp {
+          from { transform: translateY(100px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes bounceSlow {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        .nav-float {
+          animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .animate-bounce-slow {
+          animation: bounceSlow 4s ease-in-out infinite;
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3/",
+    "@google/genai": "https://esm.sh/@google/genai@^0.21.0"
+  }
+}
+</script>
+</head>
+<body>
+    <div id="root" style="background-color: #0F110F; min-height: 100vh;"></div>
+    <!-- Точка входа для Vite и Vercel -->
+    <script type="module" src="/index.tsx"></script>
+</body>
+</html>

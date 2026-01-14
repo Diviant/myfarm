@@ -1,0 +1,8 @@
+{
+  "name": "ФермаРядом",
+  "description": "Покупай у фермеров поблизости. Маркетплейс натуральных продуктов и живности.",
+  "requestFramePermissions": [
+    "geolocation",
+    "camera"
+  ]
+}
