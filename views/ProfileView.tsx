@@ -6,17 +6,23 @@ import { TelegramUser } from '../types';
 interface ProfileViewProps {
   user: TelegramUser | null;
   region: string | null;
+  productsCount: number;
   onAdminClick: () => void;
 }
 
-const ProfileView: React.FC<ProfileViewProps> = ({ user, region, onAdminClick }) => {
+const ProfileView: React.FC<ProfileViewProps> = ({ user, region, productsCount, onAdminClick }) => {
   const handleNotImplemented = (label: string) => {
-    window.Telegram.WebApp?.HapticFeedback?.notificationOccurred('warning');
-    window.Telegram.WebApp?.showPopup({
-      title: 'В разработке',
-      message: `Раздел "${label}" скоро появится. Мы работаем над этим!`,
-      buttons: [{ type: 'ok', text: 'Понятно' }]
-    });
+    const tg = window.Telegram?.WebApp;
+    if (tg && tg.showPopup) {
+      tg.HapticFeedback?.notificationOccurred('warning');
+      tg.showPopup({
+        title: 'В разработке',
+        message: `Раздел "${label}" скоро появится. Мы работаем над этим!`,
+        buttons: [{ type: 'ok', text: 'Понятно' }]
+      });
+    } else {
+      alert(`Раздел "${label}" скоро появится! Мы уже готовим его для вас.`);
+    }
   };
 
   return (
@@ -66,7 +72,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, region, onAdminClick })
           </div>
           <button 
             onClick={() => {
-              window.Telegram.WebApp?.HapticFeedback?.impactOccurred('medium');
+              window.Telegram?.WebApp?.HapticFeedback?.impactOccurred('medium');
               onAdminClick();
             }}
             className="w-full bg-[#F59E0B] text-black py-4.5 rounded-[22px] font-black uppercase tracking-widest text-[11px] transition-all active:scale-95 shadow-[0_15px_30px_-10px_rgba(245,158,11,0.4)]"
@@ -85,7 +91,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, region, onAdminClick })
         <MenuItem 
           icon={<Package size={20} />} 
           label="Мои объявления" 
-          badge="2" 
+          badge={productsCount.toString()} 
           onClick={onAdminClick}
         />
         
@@ -115,7 +121,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ user, region, onAdminClick })
         
         <button 
           onClick={() => {
-            window.Telegram.WebApp?.HapticFeedback?.notificationOccurred('error');
+            window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('error');
             window.location.reload();
           }}
           className="w-full flex items-center justify-center gap-3 p-5 rounded-3xl text-gray-500 font-black uppercase tracking-widest text-[10px] active:bg-red-500/10 active:text-red-400 transition-all mt-10 border border-white/5 bg-[#1A1D1A]/30"
@@ -138,7 +144,7 @@ interface MenuItemProps {
 const MenuItem: React.FC<MenuItemProps> = ({ icon, label, badge, onClick }) => (
   <button 
     onClick={() => {
-      window.Telegram.WebApp?.HapticFeedback?.impactOccurred('light');
+      window.Telegram?.WebApp?.HapticFeedback?.impactOccurred('light');
       onClick();
     }}
     className="w-full flex items-center justify-between p-5.5 bg-[#1A1D1A] border border-white/5 rounded-[28px] active:bg-white/5 active:scale-[0.98] transition-all group"

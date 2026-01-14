@@ -31,7 +31,7 @@ const App: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
 
   useEffect(() => {
-    const tg = window.Telegram.WebApp;
+    const tg = window.Telegram?.WebApp;
     if (tg) {
       tg.ready();
       tg.expand();
@@ -120,7 +120,7 @@ const App: React.FC = () => {
       }
       return chat;
     }));
-    window.Telegram.WebApp?.HapticFeedback?.impactOccurred('light');
+    window.Telegram?.WebApp?.HapticFeedback?.impactOccurred('light');
   };
 
   const renderView = () => {
@@ -140,7 +140,7 @@ const App: React.FC = () => {
       case 'create-listing':
         return <CreateListingView onCancel={() => setView('home')} onSuccess={(p) => { setProducts([p, ...products]); setView('home'); }} region={region || 'Не указан'} user={user} />;
       case 'profile':
-        return <ProfileView user={user} region={region} onAdminClick={() => setView('admin-dashboard')} />;
+        return <ProfileView user={user} region={region} productsCount={products.length} onAdminClick={() => setView('admin-dashboard')} />;
       case 'messages':
         return (
           <MessagesView 
@@ -184,7 +184,7 @@ const App: React.FC = () => {
     <Layout 
       activeView={view} 
       onViewChange={(newView) => {
-        window.Telegram.WebApp?.HapticFeedback?.impactOccurred('light');
+        window.Telegram?.WebApp?.HapticFeedback?.impactOccurred('light');
         setView(newView);
       }}
       region={region}
